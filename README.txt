@@ -1,93 +1,209 @@
-MT5 Multi-Account P/L Dashboard
-=================================
-
-FILES
------
-  run_reports.bat     - Exports HTML reports from all 10 MT5 terminals, then calls merge_summary.vbs
-  merge_summary.vbs   - Parses exported reports, aggregates P/L data, writes dashboard.html
-  dashboard.html      - Output dashboard (overwritten each run); open in any browser
+คู่มือการใช้งาน MT5 Multi-Account P/L Dashboard
+=================================================
+สำหรับผู้ใช้ทั่วไป — อ่านทีละขั้นตอน ทำตามได้เลยครับ
 
 
-FOLDER LAYOUT ON THE WINDOWS SERVER
--------------------------------------
+===============================================================
+ไฟล์ที่มีในชุดนี้ทำอะไร
+===============================================================
+
+  run_reports.bat    - สั่งให้ MT5 ทั้ง 10 บัญชีส่งออกรายงาน
+  merge_summary.vbs  - อ่านรายงาน แล้วรวมข้อมูลเขียนเป็น Dashboard
+  dashboard.html     - หน้า Dashboard ที่เปิดดูในเบราว์เซอร์ได้
+
+
+===============================================================
+โครงสร้างโฟลเดอร์ที่ต้องมีบน Server
+===============================================================
+
   C:\MT5_Accounts\
-      ACC_001\terminal64.exe   (+ portable.ini)
-      ACC_002\terminal64.exe
-      ...
-      ACC_010\terminal64.exe
+      ACC_001\
+          terminal64.exe
+          portable.ini        <-- ต้องสร้างเอง (ดูขั้นตอนที่ 2)
+      ACC_002\
+          terminal64.exe
+          portable.ini
+      ... (ครบ 10 โฟลเดอร์)
 
-  C:\MT5_Reports\
+  C:\MT5_Reports\             <-- วางไฟล์จากชุดนี้ทั้งหมดไว้ที่นี่
       run_reports.bat
       merge_summary.vbs
-      dashboard.html           (auto-generated output)
-      reports\
-          ACC_001.html         (MT5-exported reports — auto-generated)
-          ACC_002.html
-          ...
-          ACC_010.html
+      dashboard.html
+      reports\                <-- โฟลเดอร์นี้จะถูกสร้างอัตโนมัติตอนรัน
 
 
-FIRST-TIME SETUP
------------------
-1. Copy all files into C:\MT5_Reports\
-2. Open run_reports.bat in Notepad and fill in real account credentials:
-     SET ACC_001_LOGIN=<your login>
-     SET ACC_001_PASS=<your password>
-     SET ACC_001_SERVER=<broker server name>
-   Repeat for all 10 accounts.
-3. Make sure each MT5 terminal folder contains a valid portable.ini.
-   Create a minimal portable.ini if missing:
-     [Common]
-     PortablePath=1
-4. Double-click run_reports.bat to do a test run.
-5. Open C:\MT5_Reports\dashboard.html in your browser to verify data.
+===============================================================
+ขั้นตอนที่ 1 — คัดลอกไฟล์ไปวางบน Server
+===============================================================
+
+1. เปิด File Explorer ไปที่ไดรฟ์ C:
+2. สร้างโฟลเดอร์ใหม่ชื่อ  MT5_Reports
+   (คลิกขวาในพื้นที่ว่าง → New → Folder → พิมพ์ MT5_Reports)
+3. คัดลอกไฟล์ทั้ง 3 ไฟล์นี้ไปวางในโฟลเดอร์นั้น:
+     run_reports.bat
+     merge_summary.vbs
+     dashboard.html
 
 
-TASK SCHEDULER — HOURLY UPDATES
----------------------------------
-1. Open Task Scheduler  (Win+R → taskschd.msc → Enter)
-2. Click "Create Basic Task" in the right panel.
-3. Name:    MT5 PnL Dashboard
-   Description: Exports MT5 reports and regenerates P/L dashboard every hour
-4. Trigger: Daily  →  set start time (e.g. 07:00)
-5. Action:  Start a program
-   Program/script:  C:\MT5_Reports\run_reports.bat
-6. Finish the wizard, then open the task Properties:
-   Triggers tab → Edit trigger:
-     [x] Repeat task every:  1 hour
-         for a duration of:  Indefinitely
-7. Settings tab:
-     [x] Run task as soon as possible after a scheduled start is missed
-     [x] If the task fails, restart every: 5 minutes, up to 3 times
-8. General tab:
-     [x] Run whether user is logged on or not
-     [x] Run with highest privileges  (if C:\MT5_Accounts needs admin rights)
-9. Click OK, enter your Windows password when prompted.
+===============================================================
+ขั้นตอนที่ 2 — สร้างไฟล์ portable.ini ในแต่ละโฟลเดอร์ MT5
+===============================================================
+
+ไฟล์ portable.ini บอกให้ MT5 ทำงานแบบ "แยกอิสระ" ต่อกัน
+ต้องสร้างทีละโฟลเดอร์ ทำซ้ำ 10 รอบ (ACC_001 ถึง ACC_010)
+
+วิธีสร้าง (ทำเหมือนกันทุกโฟลเดอร์):
+
+  1. เปิด Notepad
+     (กด Start → พิมพ์ notepad → กด Enter)
+
+  2. พิมพ์ข้อความนี้ลงไปในหน้า Notepad:
+
+        [Common]
+        PortablePath=1
+
+     (พิมพ์ตรงๆ เหมือนที่เห็นเลย ไม่ต้องเพิ่มอะไร)
+
+  3. คลิก File → Save As
+
+  4. ในหน้าต่าง Save As ให้ทำดังนี้:
+     - ไปที่โฟลเดอร์:  C:\MT5_Accounts\ACC_001\
+     - ช่อง "File name" ให้พิมพ์:   portable.ini
+       (ต้องใส่เครื่องหมายคำพูดด้วย เพื่อกันไม่ให้ Windows
+        บันทึกเป็น portable.ini.txt โดยอัตโนมัติ)
+     - ช่อง "Save as type" เลือก:   All Files (*.*)
+     - กด Save
+
+  5. ทำซ้ำข้อ 1-4 สำหรับ ACC_002, ACC_003, ... จนถึง ACC_010
+     เปลี่ยนแค่โฟลเดอร์ปลายทางในข้อ 4 เท่านั้น
+
+  ตรวจสอบ: เปิดโฟลเดอร์ ACC_001 แล้วควรเห็น
+     terminal64.exe
+     portable.ini   <-- ต้องมีไอคอนเป็นเฟืองหรือไฟล์ธรรมดา ไม่ใช่ .txt
 
 
-VIEWING THE DASHBOARD
-----------------------
-Open C:\MT5_Reports\dashboard.html in any browser.
-The page auto-refreshes every 5 minutes so you can leave it open on a monitor.
-For remote access, share the file via a local network share or a web server (IIS, nginx).
+===============================================================
+ขั้นตอนที่ 3 — ใส่ข้อมูลบัญชี MT5 ใน run_reports.bat
+===============================================================
+
+1. คลิกขวาที่ไฟล์  C:\MT5_Reports\run_reports.bat
+2. เลือก  Edit  (หรือ "Open with" → Notepad)
+3. เลื่อนลงมาหาส่วนนี้:
+
+     SET ACC_001_LOGIN=10001
+     SET ACC_001_PASS=Password1
+     SET ACC_001_SERVER=BrokerName-Demo
+
+4. แก้ไขให้ตรงกับข้อมูลจริงของแต่ละบัญชี เช่น:
+
+     SET ACC_001_LOGIN=3045678
+     SET ACC_001_PASS=MyRealPass123
+     SET ACC_001_SERVER=ICMarkets-Live01
+
+   - LOGIN   = เลขบัญชี MT5 (ตัวเลขที่ใช้ล็อกอิน)
+   - PASS    = รหัสผ่านบัญชี MT5
+   - SERVER  = ชื่อ Server ของโบรกเกอร์ (ดูได้ใน MT5 → ไฟล์ → เชื่อมต่อ)
+
+5. ทำซ้ำสำหรับ ACC_002 ถึง ACC_010
+6. กด Ctrl+S เพื่อบันทึกไฟล์ แล้วปิด Notepad
 
 
-TROUBLESHOOTING
-----------------
-- Report file not created after run:
-    Check that terminal64.exe path is correct in run_reports.bat.
-    Increase WAIT_SECONDS if MT5 needs more time to connect (slow broker).
-    Verify the broker server name matches exactly what MT5 Manager shows.
+===============================================================
+ขั้นตอนที่ 4 — ทดสอบรันครั้งแรก
+===============================================================
 
-- All values show 0.00 in dashboard:
-    The HTML parser in merge_summary.vbs looks for MT5's standard label text
-    ("Balance", "Equity", "Profit for today", etc.).
-    Open one of the exported acc_00X.html files and check the exact label wording.
-    Update ParseMetric / ParsePLPeriod in merge_summary.vbs to match.
+1. ดับเบิ้ลคลิกที่ไฟล์  C:\MT5_Reports\run_reports.bat
+2. จะมีหน้าต่างดำ (Command Prompt) ขึ้นมา
+3. รอให้ทำงานจนเสร็จ — MT5 แต่ละตัวจะเปิดขึ้นมาสักครู่แล้วปิดเอง
+   (ปกติใช้เวลาประมาณ 3-5 นาทีสำหรับ 10 บัญชี)
+4. เมื่อเสร็จหน้าต่างดำจะแสดงข้อความ  [DONE]  แล้วปิดไปเอง
 
-- MT5 window flashes briefly and report is empty:
-    MT5 connected but could not authenticate.  Double-check login/password/server.
+สิ่งที่ควรเห็นหลังรันเสร็จ:
+  - โฟลเดอร์  C:\MT5_Reports\reports\  ถูกสร้างขึ้น
+  - มีไฟล์  ACC_001.html ถึง ACC_010.html  อยู่ในนั้น
+  - ไฟล์  C:\MT5_Reports\dashboard.html  ถูกอัปเดต
 
-- Script blocked by execution policy (if run via PowerShell):
-    Run cscript directly:  cscript //NoLogo C:\MT5_Reports\merge_summary.vbs
-    The .bat file already uses cscript so this should not be an issue.
+
+===============================================================
+ขั้นตอนที่ 5 — เปิดดู Dashboard
+===============================================================
+
+1. ไปที่โฟลเดอร์  C:\MT5_Reports\
+2. ดับเบิ้ลคลิกที่  dashboard.html
+3. เบราว์เซอร์จะเปิดขึ้นมาแสดงข้อมูลบัญชีทั้งหมด
+4. หน้าจะรีเฟรชเองทุก 5 นาที — สามารถเปิดทิ้งไว้บนจอมอนิเตอร์ได้เลย
+
+
+===============================================================
+ขั้นตอนที่ 6 — ตั้งให้รันอัตโนมัติทุก 1 ชั่วโมง (Task Scheduler)
+===============================================================
+
+1. กด  Win+R  บนคีย์บอร์ด (กดปุ่ม Windows ค้างแล้วกด R)
+2. พิมพ์   taskschd.msc   แล้วกด Enter
+3. หน้าต่าง Task Scheduler เปิดขึ้น
+4. ทางขวามือ คลิก  "Create Basic Task..."
+5. ใส่ข้อมูล:
+     Name:         MT5 PnL Dashboard
+     Description:  อัปเดต Dashboard ทุก 1 ชั่วโมง
+   แล้วกด Next
+6. Trigger: เลือก  Daily  → กด Next
+   ตั้งเวลาเริ่มต้น เช่น 07:00:00 → กด Next
+7. Action: เลือก  "Start a program"  → กด Next
+   Program/script: ใส่   C:\MT5_Reports\run_reports.bat
+   กด Next → กด Finish
+8. ตั้งให้รันซ้ำทุกชั่วโมง (ขั้นตอนสำคัญ):
+   - ในรายการ Task ตรงกลาง หา  "MT5 PnL Dashboard"
+   - คลิกขวา → Properties
+   - คลิกแท็บ  Triggers  → คลิก Edit
+   - ติ๊กถูก  "Repeat task every:"  แล้วเลือก  1 hour
+   - ช่อง "for a duration of:" เลือก  Indefinitely
+   - กด OK
+9. คลิกแท็บ  General:
+   - ติ๊กถูก  "Run whether user is logged on or not"
+   - ติ๊กถูก  "Run with highest privileges"
+10. กด OK → กรอก Password Windows ของคุณ → กด OK
+
+
+===============================================================
+การแก้ปัญหาเบื้องต้น
+===============================================================
+
+ปัญหา: หน้าต่างดำเปิดขึ้นมาแล้วปิดทันที ไม่เห็นอะไร
+  → คลิกขวาที่ run_reports.bat → เลือก "Run as administrator"
+
+ปัญหา: ไม่มีไฟล์ ACC_001.html เกิดขึ้นหลังรัน
+  → ตรวจสอบว่า terminal64.exe อยู่ใน C:\MT5_Accounts\ACC_001\ จริง
+  → ตรวจสอบว่ามีไฟล์ portable.ini ในโฟลเดอร์นั้น
+  → ลองเพิ่มเวลารอ: เปิด run_reports.bat แก้   SET WAIT_SECONDS=15
+    เป็น  SET WAIT_SECONDS=25  แล้วรันใหม่
+
+ปัญหา: Dashboard แสดงค่า 0.00 ทุกช่อง
+  → Login / Password / Server ที่ใส่ใน run_reports.bat อาจผิด
+  → ตรวจสอบชื่อ Server: เปิด MT5 ปกติ → เมนู File
+    → Open an Account → ดูชื่อ Server ที่ถูกต้อง
+
+ปัญหา: ค่า Balance / Equity ขึ้น แต่ P/L เป็น 0 ทุกช่อง
+  → MT5 ของโบรกเกอร์บางเจ้าใช้ภาษาไทยหรือชื่อ label ต่างออกไป
+  → แจ้งผู้ดูแลระบบเพื่อปรับ merge_summary.vbs ให้ตรง
+
+ปัญหา: portable.ini ถูกบันทึกเป็น portable.ini.txt
+  → เปิด File Explorer → View → ติ๊กถูก "File name extensions"
+  → ถ้าเห็น .txt ต่อท้าย ให้คลิกขวา → Rename
+    แล้วลบ .txt ออก กด Enter ยืนยัน
+
+
+===============================================================
+คำถามที่พบบ่อย
+===============================================================
+
+Q: ต้องเปิด MT5 ทั้ง 10 ตัวทิ้งไว้ตลอดไหม?
+A: ไม่ต้องครับ run_reports.bat จะเปิด MT5 แต่ละตัวเอง
+   ดึงข้อมูล แล้วปิดไปเองอัตโนมัติ
+
+Q: Dashboard อัปเดตบ่อยแค่ไหน?
+A: อัปเดตทุกครั้งที่ run_reports.bat รัน
+   ถ้าตั้ง Task Scheduler แล้ว ก็จะอัปเดตทุก 1 ชั่วโมงอัตโนมัติ
+
+Q: เปิด Dashboard จากคอมเครื่องอื่นในออฟฟิศได้ไหม?
+A: ได้ครับ ให้แชร์โฟลเดอร์ C:\MT5_Reports\
+   แล้วเปิดไฟล์ dashboard.html ผ่าน Network Path ได้เลย

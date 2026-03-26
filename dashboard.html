@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="300">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MT5 Multi-Account P/L Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; padding: 20px; }
+    h1 { font-size: 1.6rem; font-weight: 600; color: #58a6ff; margin-bottom: 4px; }
+    .subtitle { font-size: 0.85rem; color: #8b949e; margin-bottom: 24px; }
+
+    /* Summary cards */
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px 18px; }
+    .card .label { font-size: 0.75rem; color: #8b949e; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+    .card .value { font-size: 1.35rem; font-weight: 700; }
+
+    /* P/L color classes */
+    .profit  { color: #3fb950; }
+    .loss    { color: #f85149; }
+    .neutral { color: #e6edf3; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    thead tr { background: #21262d; }
+    th { padding: 10px 14px; text-align: right; color: #8b949e; font-weight: 600;
+         font-size: 0.78rem; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+    th:first-child { text-align: left; }
+    td { padding: 10px 14px; text-align: right; border-bottom: 1px solid #21262d; white-space: nowrap; }
+    td:first-child { text-align: left; font-weight: 600; color: #58a6ff; }
+    tbody tr:hover { background: #1c2128; }
+    tfoot tr { background: #21262d; font-weight: 700; }
+    tfoot td { border-top: 2px solid #388bfd; border-bottom: none; color: #e6edf3; }
+    tfoot td:first-child { color: #58a6ff; }
+
+    .badge-ok      { display:inline-block; padding:1px 7px; border-radius:10px; font-size:0.7rem;
+                     background:#1a3a2a; color:#3fb950; border:1px solid #2ea043; }
+    .badge-missing { display:inline-block; padding:1px 7px; border-radius:10px; font-size:0.7rem;
+                     background:#3a1a1a; color:#f85149; border:1px solid #b91c1c; }
+
+    .footer { margin-top: 28px; font-size: 0.78rem; color: #8b949e; text-align: center; }
+    section h2 { font-size: 1rem; color: #c9d1d9; margin-bottom: 12px;
+                 padding-bottom: 8px; border-bottom: 1px solid #30363d; }
+
+    .placeholder-note {
+      background: #161b22; border: 1px dashed #30363d; border-radius: 8px;
+      padding: 24px; text-align: center; color: #8b949e; margin-bottom: 28px;
+    }
+    .placeholder-note strong { color: #e6edf3; display: block; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h1>MT5 Multi-Account P/L Dashboard</h1>
+  <p class="subtitle">
+    Last updated: <span id="ts">— awaiting first run —</span>
+    &nbsp;&bull;&nbsp; Auto-refresh every 5 minutes
+  </p>
+
+  <!-- =====================================================
+       PLACEHOLDER — this file is overwritten by merge_summary.vbs
+       on each run. The content below shows the expected structure.
+       ===================================================== -->
+
+  <div class="placeholder-note">
+    <strong>Dashboard not yet populated</strong>
+    Run <code>run_reports.bat</code> to export MT5 reports and generate live data.<br>
+    This file will be replaced with live account data automatically.
+  </div>
+
+  <!-- Summary cards -->
+  <div class="cards">
+    <div class="card">
+      <div class="label">Total Balance</div>
+      <div class="value neutral">0.00</div>
+    </div>
+    <div class="card">
+      <div class="label">Total Equity</div>
+      <div class="value neutral">0.00</div>
+    </div>
+    <div class="card">
+      <div class="label">P/L Today</div>
+      <div class="value neutral">0.00</div>
+    </div>
+    <div class="card">
+      <div class="label">P/L This Week</div>
+      <div class="value neutral">0.00</div>
+    </div>
+    <div class="card">
+      <div class="label">P/L This Month</div>
+      <div class="value neutral">0.00</div>
+    </div>
+    <div class="card">
+      <div class="label">P/L This Year</div>
+      <div class="value neutral">0.00</div>
+    </div>
+  </div>
+
+  <!-- Per-account table -->
+  <section>
+    <h2>Per-Account Breakdown</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>Status</th>
+            <th>Balance</th>
+            <th>Equity</th>
+            <th>P/L Today</th>
+            <th>P/L Week</th>
+            <th>P/L Month</th>
+            <th>P/L Year</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>ACC_001</td><td style="text-align:center"><span class="badge-missing">Missing</span></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td></tr>
+          <tr><td>ACC_002</td><td style="text-align:center"><span class="badge-missing">Missing</span></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td></tr>
+          <tr><td>ACC_003</td><td style="text-align:center"><span class="badge-missing">Missing</span></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td></tr>
+          <tr><td>ACC_004</td><td style="text-align:center"><span class="badge-missing">Missing</span></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td></tr>
+          <tr><td>ACC_005</td><td style="text-align:center"><span class="badge-missing">Missing</span></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td></tr>
+          <tr><td>ACC_006</td><td style="text-align:center"><span class="badge-missing">Missing</span></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td></tr>
+          <tr><td>ACC_007</td><td style="text-align:center"><span class="badge-missing">Missing</span></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td></tr>
+          <tr><td>ACC_008</td><td style="text-align:center"><span class="badge-missing">Missing</span></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td></tr>
+          <tr><td>ACC_009</td><td style="text-align:center"><span class="badge-missing">Missing</span></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td></tr>
+          <tr><td>ACC_010</td><td style="text-align:center"><span class="badge-missing">Missing</span></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td></tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">TOTAL</td>
+            <td>0.00</td>
+            <td>0.00</td>
+            <td>0.00</td>
+            <td>0.00</td>
+            <td>0.00</td>
+            <td>0.00</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+  <p class="footer">MT5 Multi-Account P/L Dashboard &bull; Generated by merge_summary.vbs</p>
+</body>
+</html>
